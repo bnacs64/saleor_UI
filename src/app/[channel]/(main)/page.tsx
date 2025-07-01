@@ -3,6 +3,9 @@ import { executeGraphQL } from "@/lib/graphql";
 import { ProductList } from "@/ui/components/ProductList";
 import { HeroSection } from "@/ui/components/HeroSection";
 import { CategoryGrid } from "@/ui/components/CategoryGrid";
+import { BrandShowcase } from "@/ui/components/BrandShowcase";
+import { ShopAndGetMore } from "@/ui/components/ShopAndGetMore";
+import { AppDownload } from "@/ui/components/AppDownload";
 import { PromotionalBanners, DeliveryInfoBanner } from "@/ui/components/PromotionalBanners";
 
 export const metadata = {
@@ -35,6 +38,15 @@ export default async function Page(props: { params: Promise<{ channel: string }>
 
 			{/* Category Grid */}
 			<CategoryGrid channel={params.channel} />
+
+			{/* Brand Showcase */}
+			<BrandShowcase channel={params.channel} />
+
+			{/* Shop & Get More Features */}
+			<ShopAndGetMore />
+
+			{/* App Download Section */}
+			<AppDownload />
 
 			{/* Promotional Banners */}
 			<PromotionalBanners channel={params.channel} />

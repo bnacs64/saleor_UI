@@ -2,136 +2,126 @@ import { LinkWithChannel } from "../atoms/LinkWithChannel";
 
 export function HeroSection() {
 	return (
-		<div className="relative overflow-hidden bg-gradient-to-r from-primary-600 to-primary-700">
-			<div className="absolute inset-0">
-				<div className="absolute inset-0 bg-primary-600 mix-blend-multiply" />
+		<div className="relative overflow-hidden bg-gradient-to-r from-chaldal-green to-chaldal-green-dark">
+			{/* Background pattern */}
+			<div className="absolute inset-0 opacity-10">
+				<div
+					className="absolute inset-0 bg-white/5"
+					style={{
+						backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)",
+						backgroundSize: "20px 20px",
+					}}
+				/>
 			</div>
-			<div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+
+			<div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
 				<div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-2">
+					{/* Left side - Main content */}
 					<div className="text-center lg:text-left">
+						<div className="mb-4">
+							<span className="inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-sm font-medium text-white">
+								🎉 Grand Opening Special
+							</span>
+						</div>
 						<h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-6xl">
 							Fresh Groceries
-							<span className="block text-accent-300">Delivered Fast</span>
+							<span className="block text-chaldal-orange">Delivered in 1 Hour</span>
 						</h1>
-						<p className="mt-4 max-w-3xl text-lg text-primary-100 sm:text-xl">
-							Get fresh produce, pantry essentials, and household items delivered to your doorstep. Same-day
-							delivery available in your area.
+						<p className="mt-4 max-w-3xl text-lg text-white/90 sm:text-xl">
+							Get fresh produce, daily essentials, and household items delivered to your doorstep. Pay after
+							receiving your order with our trusted service.
 						</p>
-						<div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4 lg:justify-start">
+
+						{/* CTA Buttons */}
+						<div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start">
 							<LinkWithChannel
 								href="/products"
-								className="inline-flex items-center justify-center rounded-md border border-transparent bg-white px-6 py-3 text-sm font-medium text-primary-700 transition-colors duration-200 hover:bg-gray-50 sm:px-8 sm:text-base"
+								className="btn-chaldal-secondary inline-flex transform items-center justify-center text-lg font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
 							>
-								Shop Now
+								🛒 Start Shopping
 							</LinkWithChannel>
 							<LinkWithChannel
-								href="/categories"
-								className="inline-flex items-center justify-center rounded-md border-2 border-white px-6 py-3 text-sm font-medium text-white transition-colors duration-200 hover:bg-white hover:text-primary-700 sm:px-8 sm:text-base"
+								href="/offers"
+								className="inline-flex items-center justify-center rounded-md border-2 border-white px-8 py-3 text-lg font-semibold text-white transition-all duration-200 hover:bg-white hover:text-chaldal-green"
 							>
-								Browse Categories
+								View Offers
 							</LinkWithChannel>
 						</div>
-						<div className="mt-6 flex flex-col items-center justify-center space-y-2 text-primary-100 sm:flex-row sm:space-x-6 sm:space-y-0 lg:justify-start">
-							<div className="flex items-center">
-								<svg className="mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="currentColor" viewBox="0 0 20 20">
-									<path
-										fillRule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clipRule="evenodd"
-									/>
-								</svg>
-								<span className="text-xs sm:text-sm">Free delivery over $50</span>
+						{/* Chaldal-style Service Highlights */}
+						<div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
+							<div className="flex flex-col items-center text-center">
+								<div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+									<span className="text-2xl">📦</span>
+								</div>
+								<span className="text-sm font-medium text-white">+15000</span>
+								<span className="text-xs text-white/80">Products</span>
 							</div>
-							<div className="flex items-center">
-								<svg className="mr-2 h-4 w-4 sm:h-5 sm:w-5" fill="currentColor" viewBox="0 0 20 20">
-									<path
-										fillRule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-										clipRule="evenodd"
-									/>
-								</svg>
-								<span className="text-xs sm:text-sm">Same-day delivery</span>
+							<div className="flex flex-col items-center text-center">
+								<div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+									<span className="text-2xl">💰</span>
+								</div>
+								<span className="text-sm font-medium text-white">Pay After</span>
+								<span className="text-xs text-white/80">Receiving</span>
+							</div>
+							<div className="flex flex-col items-center text-center">
+								<div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+									<span className="text-2xl">⚡</span>
+								</div>
+								<span className="text-sm font-medium text-white">1 Hour</span>
+								<span className="text-xs text-white/80">Delivery</span>
+							</div>
+							<div className="flex flex-col items-center text-center">
+								<div className="mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+									<span className="text-2xl">💸</span>
+								</div>
+								<span className="text-sm font-medium text-white">Save Money</span>
+								<span className="text-xs text-white/80">Offers</span>
 							</div>
 						</div>
 					</div>
+
+					{/* Right side - Visual showcase */}
 					<div className="relative">
 						<div className="relative mx-auto w-full max-w-lg">
-							<div className="relative overflow-hidden rounded-lg shadow-lg">
-								<div className="rounded-lg bg-white p-8">
-									<div className="grid grid-cols-2 gap-4">
-										<div className="text-center">
-											<div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
-												<svg
-													className="h-8 w-8 text-primary-600"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth={2}
-														d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"
-													/>
-												</svg>
-											</div>
-											<h3 className="text-sm font-medium text-gray-900">Fresh Produce</h3>
-										</div>
-										<div className="text-center">
-											<div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-secondary-100">
-												<svg
-													className="h-8 w-8 text-secondary-600"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth={2}
-														d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-													/>
-												</svg>
-											</div>
-											<h3 className="text-sm font-medium text-gray-900">Dairy & Eggs</h3>
-										</div>
-										<div className="text-center">
-											<div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-accent-100">
-												<svg
-													className="h-8 w-8 text-accent-600"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth={2}
-														d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-													/>
-												</svg>
-											</div>
-											<h3 className="text-sm font-medium text-gray-900">Pantry</h3>
-										</div>
-										<div className="text-center">
-											<div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-primary-100">
-												<svg
-													className="h-8 w-8 text-primary-600"
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth={2}
-														d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16l3-1m-3 1l-3-1"
-													/>
-												</svg>
-											</div>
-											<h3 className="text-sm font-medium text-gray-900">Beverages</h3>
+							{/* Main showcase card */}
+							<div className="card-chaldal relative overflow-hidden bg-white p-6 shadow-2xl">
+								<div className="text-center">
+									<div className="mb-4">
+										<div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-chaldal-green">
+											<span className="text-3xl">🛒</span>
 										</div>
 									</div>
+									<h3 className="mb-2 text-xl font-bold text-chaldal-gray-dark">FreshMart Delivery</h3>
+									<p className="mb-4 text-sm text-chaldal-gray-medium">Your trusted grocery partner</p>
+
+									{/* Quick stats */}
+									<div className="grid grid-cols-2 gap-4 text-center">
+										<div className="rounded-lg bg-green-50 p-3">
+											<div className="text-lg font-bold text-chaldal-green">50K+</div>
+											<div className="text-xs text-chaldal-gray-medium">Happy Customers</div>
+										</div>
+										<div className="rounded-lg bg-orange-50 p-3">
+											<div className="text-lg font-bold text-chaldal-orange">99%</div>
+											<div className="text-xs text-chaldal-gray-medium">On-time Delivery</div>
+										</div>
+									</div>
+								</div>
+
+								{/* Floating elements */}
+								<div className="absolute -right-2 -top-2 rounded-full bg-chaldal-orange px-2 py-1 text-xs font-bold text-white">
+									NEW
+								</div>
+							</div>
+
+							{/* Floating service badges */}
+							<div className="absolute -left-4 top-1/2 -translate-y-1/2 transform">
+								<div className="rounded-full bg-white p-3 shadow-lg">
+									<span className="text-2xl">⚡</span>
+								</div>
+							</div>
+							<div className="absolute -right-4 top-1/4">
+								<div className="rounded-full bg-white p-3 shadow-lg">
+									<span className="text-2xl">🎯</span>
 								</div>
 							</div>
 						</div>

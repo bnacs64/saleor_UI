@@ -2,14 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+
+:root {
+	/* Chaldal color variables */
+	--chaldal-green: #00b853;
+	--chaldal-green-dark: #00a04b;
+	--chaldal-orange: #ff6b35;
+	--chaldal-gray-light: #f8f9fa;
+	--chaldal-gray-medium: #6c757d;
+	--chaldal-gray-dark: #343a40;
+}
 
 body {
 	overflow-x: hidden;
-	font-family: 'Inter', system-ui, sans-serif;
+	font-family: "Inter", system-ui, sans-serif;
+	background-color: #ffffff;
+	color: var(--chaldal-gray-dark);
 }
 
-/* Grocery-specific utility classes */
+/* Chaldal-style utility classes */
 @layer utilities {
 	.line-clamp-2 {
 		display: -webkit-box;
@@ -26,6 +38,48 @@ body {
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 	}
+
+	/* Chaldal-style buttons */
+	.btn-chaldal-primary {
+		background-color: var(--chaldal-green);
+		color: white;
+		padding: 12px 24px;
+		border-radius: 6px;
+		font-weight: 600;
+		transition: all 0.2s ease;
+	}
+
+	.btn-chaldal-primary:hover {
+		background-color: var(--chaldal-green-dark);
+		transform: translateY(-1px);
+	}
+
+	.btn-chaldal-secondary {
+		background-color: var(--chaldal-orange);
+		color: white;
+		padding: 12px 24px;
+		border-radius: 6px;
+		font-weight: 600;
+		transition: all 0.2s ease;
+	}
+
+	.btn-chaldal-secondary:hover {
+		background-color: #e55a2b;
+		transform: translateY(-1px);
+	}
+
+	/* Chaldal-style cards */
+	.card-chaldal {
+		background: white;
+		border-radius: 12px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+		transition: all 0.3s ease;
+	}
+
+	.card-chaldal:hover {
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+		transform: translateY(-2px);
+	}
 }
 
 /* Custom scrollbar for better UX */
@@ -35,21 +89,32 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-	background: #f1f5f9;
+	background: var(--chaldal-gray-light);
 }
 
 ::-webkit-scrollbar-thumb {
-	background: #cbd5e1;
+	background: var(--chaldal-gray-medium);
 	border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background: #94a3b8;
+	background: var(--chaldal-green);
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+	-ms-overflow-style: none; /* Internet Explorer 10+ */
+	scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+	display: none; /* Safari and Chrome */
 }
 
 /* Smooth transitions for interactive elements */
 * {
-	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity,
+		box-shadow, transform, filter, backdrop-filter;
 	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	transition-duration: 150ms;
 }

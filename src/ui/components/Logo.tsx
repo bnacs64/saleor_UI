@@ -9,11 +9,11 @@ export const Logo = () => {
 	const pathname = usePathname();
 
 	const logoContent = (
-		<div className="flex items-center">
-			<div className="flex items-center justify-center w-8 h-8 bg-primary-600 rounded-lg mr-2">
-				<span className="text-white text-lg font-bold">🛒</span>
+		<div className="flex items-center space-x-2">
+			<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-chaldal-green">
+				<span className="text-lg font-bold text-white">🛒</span>
 			</div>
-			<span className="text-xl font-bold text-primary-700">{companyName}</span>
+			<span className="text-xl font-bold text-chaldal-green">{companyName}</span>
 		</div>
 	);
 
