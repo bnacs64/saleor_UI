@@ -69,10 +69,19 @@ interface CategoryGridProps {
 }
 
 export async function CategoryGrid({ channel }: CategoryGridProps) {
-	const { categories } = await executeGraphQL(CategoriesListDocument, {
-		variables: { first: 20, channel },
-		revalidate: 60 * 60, // Cache for 1 hour
-	});
+	let categories = null;
+
+	try {
+		const result = await executeGraphQL(CategoriesListDocument, {
+			variables: { first: 20, channel },
+			revalidate: 60 * 60, // Cache for 1 hour
+		});
+		categories = result.categories;
+	} catch (error) {
+		// Log error for debugging but continue with null categories
+		console.warn("Failed to fetch categories for CategoryGrid:", error);
+		// categories remains null
+	}
 
 	if (!categories?.edges?.length) {
 		return null;

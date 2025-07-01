@@ -1,22 +1,38 @@
-import { ShoppingCartIcon, HeartIcon, TagIcon, SparklesIcon, TruckIcon, PhoneIcon } from "lucide-react";
+import {
+	ShoppingCartIcon,
+	HeartIcon,
+	TagIcon,
+	SparklesIcon,
+	TruckIcon,
+	PhoneIcon,
+	type LucideIcon,
+} from "lucide-react";
 
 import { executeGraphQL } from "@/lib/graphql";
 import { CategoriesListDocument } from "@/gql/graphql";
 import { LinkWithChannel } from "@/ui/atoms/LinkWithChannel";
 
 export async function ChaldalNav({ channel }: { channel: string }) {
-	// Fetch categories from Saleor
-	const { categories } = await executeGraphQL(CategoriesListDocument, {
-		variables: { first: 8, channel },
-		revalidate: 60 * 60, // Cache for 1 hour
-	});
+	// Fetch categories from Saleor with error handling
+	let categoryItems: Array<{ name: string; href: string; icon: LucideIcon }> = [];
 
-	const categoryItems =
-		categories?.edges?.slice(0, 6).map(({ node }) => ({
-			name: node.name,
-			href: `/categories/${node.slug}`,
-			icon: getIconForCategory(node.name),
-		})) || [];
+	try {
+		const { categories } = await executeGraphQL(CategoriesListDocument, {
+			variables: { first: 8, channel },
+			revalidate: 60 * 60, // Cache for 1 hour
+		});
+
+		categoryItems =
+			categories?.edges?.slice(0, 6).map(({ node }) => ({
+				name: node.name,
+				href: `/categories/${node.slug}`,
+				icon: getIconForCategory(node.name),
+			})) || [];
+	} catch (error) {
+		// Log error for debugging but continue with empty categories
+		console.warn("Failed to fetch categories for ChaldalNav:", error);
+		// categoryItems remains empty array
+	}
 
 	// Special navigation items (Chaldal-style)
 	const specialItems = [
@@ -117,7 +133,7 @@ export async function ChaldalNav({ channel }: { channel: string }) {
 }
 
 // Helper function to assign icons to categories
-function getIconForCategory(categoryName: string) {
+function getIconForCategory(categoryName: string): LucideIcon {
 	const name = categoryName.toLowerCase();
 
 	if (name.includes("fruit") || name.includes("vegetable")) {

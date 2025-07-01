@@ -31,17 +31,24 @@ export default async function Page(props: {
 		redirect(`/search?${new URLSearchParams({ query: firstValidSearchValue }).toString()}`);
 	}
 
-	const { products } = await executeGraphQL(SearchProductsDocument, {
-		variables: {
-			first: ProductsPerPage,
-			search: searchValue,
-			after: cursor,
-			sortBy: ProductOrderField.Rating,
-			sortDirection: OrderDirection.Asc,
-			channel: params.channel,
-		},
-		revalidate: 60,
-	});
+	let products = null;
+	try {
+		const result = await executeGraphQL(SearchProductsDocument, {
+			variables: {
+				first: ProductsPerPage,
+				search: searchValue,
+				after: cursor,
+				sortBy: ProductOrderField.Rating,
+				sortDirection: OrderDirection.Asc,
+				channel: params.channel,
+			},
+			revalidate: 60,
+		});
+		products = result.products;
+	} catch (error) {
+		console.warn("Failed to search products:", error);
+		// products remains null
+	}
 
 	if (!products) {
 		notFound();

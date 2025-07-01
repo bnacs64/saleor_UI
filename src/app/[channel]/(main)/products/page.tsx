@@ -20,14 +20,21 @@ export default async function Page(props: {
 	const params = await props.params;
 	const cursor = typeof searchParams.cursor === "string" ? searchParams.cursor : null;
 
-	const { products } = await executeGraphQL(ProductListPaginatedDocument, {
-		variables: {
-			first: ProductsPerPage,
-			after: cursor,
-			channel: params.channel,
-		},
-		revalidate: 60,
-	});
+	let products = null;
+	try {
+		const result = await executeGraphQL(ProductListPaginatedDocument, {
+			variables: {
+				first: ProductsPerPage,
+				after: cursor,
+				channel: params.channel,
+			},
+			revalidate: 60,
+		});
+		products = result.products;
+	} catch (error) {
+		console.warn("Failed to fetch products:", error);
+		// products remains null
+	}
 
 	if (!products) {
 		notFound();

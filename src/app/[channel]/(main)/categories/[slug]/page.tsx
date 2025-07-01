@@ -9,23 +9,39 @@ export const generateMetadata = async (
 	parent: ResolvingMetadata,
 ): Promise<Metadata> => {
 	const params = await props.params;
-	const { category } = await executeGraphQL(ProductListByCategoryDocument, {
-		variables: { slug: params.slug, channel: params.channel },
-		revalidate: 60,
-	});
+	let category = null;
+
+	try {
+		const result = await executeGraphQL(ProductListByCategoryDocument, {
+			variables: { slug: params.slug, channel: params.channel },
+			revalidate: 60,
+		});
+		category = result.category;
+	} catch (error) {
+		console.warn("Failed to fetch category for metadata:", error);
+		// category remains null
+	}
 
 	return {
-		title: `${category?.name || "Categroy"} | ${category?.seoTitle || (await parent).title?.absolute}`,
+		title: `${category?.name || "Category"} | ${category?.seoTitle || (await parent).title?.absolute}`,
 		description: category?.seoDescription || category?.description || category?.seoTitle || category?.name,
 	};
 };
 
 export default async function Page(props: { params: Promise<{ slug: string; channel: string }> }) {
 	const params = await props.params;
-	const { category } = await executeGraphQL(ProductListByCategoryDocument, {
-		variables: { slug: params.slug, channel: params.channel },
-		revalidate: 60,
-	});
+	let category = null;
+
+	try {
+		const result = await executeGraphQL(ProductListByCategoryDocument, {
+			variables: { slug: params.slug, channel: params.channel },
+			revalidate: 60,
+		});
+		category = result.category;
+	} catch (error) {
+		console.warn("Failed to fetch category:", error);
+		// category remains null
+	}
 
 	if (!category || !category.products) {
 		notFound();

@@ -40,11 +40,20 @@ interface BrandShowcaseProps {
 }
 
 export async function BrandShowcase({ channel }: BrandShowcaseProps) {
-	// Fetch collections to represent brands
-	const { collections } = await executeGraphQL(CollectionsListDocument, {
-		variables: { first: 8, channel },
-		revalidate: 60 * 60, // Cache for 1 hour
-	});
+	// Fetch collections to represent brands with error handling
+	let collections = null;
+
+	try {
+		const result = await executeGraphQL(CollectionsListDocument, {
+			variables: { first: 8, channel },
+			revalidate: 60 * 60, // Cache for 1 hour
+		});
+		collections = result.collections;
+	} catch (error) {
+		// Log error for debugging but continue with null collections
+		console.warn("Failed to fetch collections for BrandShowcase:", error);
+		// collections remains null
+	}
 
 	if (!collections?.edges?.length) {
 		return null;

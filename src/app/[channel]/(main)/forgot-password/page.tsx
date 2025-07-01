@@ -1,18 +1,18 @@
 import { Suspense } from "react";
 import { type Metadata } from "next";
 import { Loader } from "@/ui/atoms/Loader";
-import { LoginForm } from "@/ui/components/LoginForm";
+import { ForgotPasswordForm } from "@/ui/components/ForgotPasswordForm";
 
 export const metadata: Metadata = {
-	title: "Sign In - FreshMart",
-	description: "Sign in to your FreshMart account to continue shopping for fresh groceries.",
+	title: "Forgot Password - FreshMart",
+	description: "Reset your FreshMart account password.",
 };
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
 	return (
 		<Suspense fallback={<Loader />}>
 			<section className="mx-auto max-w-7xl p-8">
-				<LoginForm />
+				<ForgotPasswordForm />
 			</section>
 		</Suspense>
 	);
