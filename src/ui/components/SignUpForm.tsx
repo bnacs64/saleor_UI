@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation } from "urql";
 import { LinkWithChannel } from "../atoms/LinkWithChannel";
-import { UserRegisterDocument, type AccountError, type UserRegisterMutation } from "@/checkout/graphql";
 
 interface SignUpFormData {
 	firstName: string;
@@ -25,7 +23,6 @@ interface FormErrors {
 
 export function SignUpForm() {
 	const router = useRouter();
-	const [, userRegister] = useMutation<UserRegisterMutation>(UserRegisterDocument);
 	const [isLoading, setIsLoading] = useState(false);
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [formData, setFormData] = useState<SignUpFormData>({
@@ -95,7 +92,25 @@ export function SignUpForm() {
 		setErrors({});
 
 		try {
-			const result = await userRegister({
+			const mutation = `
+				mutation userRegister($input: AccountRegisterInput!) {
+					accountRegister(input: $input) {
+						errors {
+							message
+							field
+							code
+						}
+						user {
+							id
+							email
+							firstName
+							lastName
+						}
+					}
+				}
+			`;
+
+			const variables = {
 				input: {
 					email: formData.email,
 					password: formData.password,
@@ -104,16 +119,29 @@ export function SignUpForm() {
 					channel: "default-channel",
 					redirectUrl: `${window.location.origin}/account-confirm`,
 				},
+			};
+
+			const response = await fetch(process.env.NEXT_PUBLIC_SALEOR_API_URL!, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					query: mutation,
+					variables: variables,
+				}),
 			});
 
-			if (result.error) {
+			const result = (await response.json()) as any;
+
+			if (result.errors) {
 				setErrors({ general: "An unexpected error occurred. Please try again." });
 				return;
 			}
 
 			if (result.data?.accountRegister?.errors && result.data.accountRegister.errors.length > 0) {
 				const apiErrors: FormErrors = {};
-				result.data.accountRegister.errors.forEach((error: AccountError) => {
+				result.data.accountRegister.errors.forEach((error: any) => {
 					const message = error.message || "An error occurred";
 					if (error.field) {
 						const field = error.field as keyof FormErrors;
@@ -143,8 +171,8 @@ export function SignUpForm() {
 		<div className="mx-auto mt-8 w-full max-w-md">
 			<div className="rounded-lg bg-white p-8 shadow-lg">
 				<div className="mb-6 text-center">
-					<h1 className="text-2xl font-bold text-chaldal-gray-dark">Create Account</h1>
-					<p className="mt-2 text-sm text-chaldal-gray-medium">
+					<h1 className="text-chaldal-gray-dark text-2xl font-bold">Create Account</h1>
+					<p className="text-chaldal-gray-medium mt-2 text-sm">
 						Join FreshMart for fresh groceries delivered to your door
 					</p>
 				</div>
@@ -156,7 +184,7 @@ export function SignUpForm() {
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div className="grid grid-cols-2 gap-4">
 						<div>
-							<label htmlFor="firstName" className="block text-sm font-medium text-chaldal-gray-dark">
+							<label htmlFor="firstName" className="text-chaldal-gray-dark block text-sm font-medium">
 								First Name
 							</label>
 							<input
@@ -165,7 +193,7 @@ export function SignUpForm() {
 								name="firstName"
 								value={formData.firstName}
 								onChange={handleInputChange}
-								className={`mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-chaldal-green ${
+								className={`focus:ring-chaldal-green mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ${
 									errors.firstName ? "border-red-300 focus:ring-red-500" : "border-gray-300"
 								}`}
 								placeholder="John"
@@ -174,7 +202,7 @@ export function SignUpForm() {
 						</div>
 
 						<div>
-							<label htmlFor="lastName" className="block text-sm font-medium text-chaldal-gray-dark">
+							<label htmlFor="lastName" className="text-chaldal-gray-dark block text-sm font-medium">
 								Last Name
 							</label>
 							<input
@@ -183,7 +211,7 @@ export function SignUpForm() {
 								name="lastName"
 								value={formData.lastName}
 								onChange={handleInputChange}
-								className={`mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-chaldal-green ${
+								className={`focus:ring-chaldal-green mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ${
 									errors.lastName ? "border-red-300 focus:ring-red-500" : "border-gray-300"
 								}`}
 								placeholder="Doe"
@@ -193,7 +221,7 @@ export function SignUpForm() {
 					</div>
 
 					<div>
-						<label htmlFor="email" className="block text-sm font-medium text-chaldal-gray-dark">
+						<label htmlFor="email" className="text-chaldal-gray-dark block text-sm font-medium">
 							Email Address
 						</label>
 						<input
@@ -202,7 +230,7 @@ export function SignUpForm() {
 							name="email"
 							value={formData.email}
 							onChange={handleInputChange}
-							className={`mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-chaldal-green ${
+							className={`focus:ring-chaldal-green mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ${
 								errors.email ? "border-red-300 focus:ring-red-500" : "border-gray-300"
 							}`}
 							placeholder="john@example.com"
@@ -211,7 +239,7 @@ export function SignUpForm() {
 					</div>
 
 					<div>
-						<label htmlFor="password" className="block text-sm font-medium text-chaldal-gray-dark">
+						<label htmlFor="password" className="text-chaldal-gray-dark block text-sm font-medium">
 							Password
 						</label>
 						<input
@@ -220,7 +248,7 @@ export function SignUpForm() {
 							name="password"
 							value={formData.password}
 							onChange={handleInputChange}
-							className={`mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-chaldal-green ${
+							className={`focus:ring-chaldal-green mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ${
 								errors.password ? "border-red-300 focus:ring-red-500" : "border-gray-300"
 							}`}
 							placeholder="••••••••"
@@ -229,7 +257,7 @@ export function SignUpForm() {
 					</div>
 
 					<div>
-						<label htmlFor="confirmPassword" className="block text-sm font-medium text-chaldal-gray-dark">
+						<label htmlFor="confirmPassword" className="text-chaldal-gray-dark block text-sm font-medium">
 							Confirm Password
 						</label>
 						<input
@@ -238,7 +266,7 @@ export function SignUpForm() {
 							name="confirmPassword"
 							value={formData.confirmPassword}
 							onChange={handleInputChange}
-							className={`mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-chaldal-green ${
+							className={`focus:ring-chaldal-green mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ${
 								errors.confirmPassword ? "border-red-300 focus:ring-red-500" : "border-gray-300"
 							}`}
 							placeholder="••••••••"
@@ -256,11 +284,11 @@ export function SignUpForm() {
 				</form>
 
 				<div className="mt-6 text-center">
-					<p className="text-sm text-chaldal-gray-medium">
+					<p className="text-chaldal-gray-medium text-sm">
 						Already have an account?{" "}
 						<LinkWithChannel
 							href="/login"
-							className="font-medium text-chaldal-green hover:text-chaldal-green-dark"
+							className="text-chaldal-green hover:text-chaldal-green-dark font-medium"
 						>
 							Sign in
 						</LinkWithChannel>

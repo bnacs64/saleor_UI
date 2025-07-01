@@ -5,7 +5,7 @@
 	"type": "module",
 	"license": "BSD-3-Clause",
 	"scripts": {
-		"dev": "next dev -p 3066",
+		"dev": "next dev -p 3067",
 		"build": "next build",
 		"start": "next start -p 3066",
 		"predev": "pnpm run generate",

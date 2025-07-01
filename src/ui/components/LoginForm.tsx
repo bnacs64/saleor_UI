@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSaleorAuthContext } from "@saleor/auth-sdk/react";
 import { LinkWithChannel } from "../atoms/LinkWithChannel";
 
 interface LoginFormData {
@@ -19,7 +18,6 @@ interface FormErrors {
 export function LoginForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { signIn } = useSaleorAuthContext();
 	const [isLoading, setIsLoading] = useState(false);
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [formData, setFormData] = useState<LoginFormData>({
@@ -70,13 +68,69 @@ export function LoginForm() {
 		setErrors({});
 
 		try {
-			const result = await signIn({
+			const mutation = `
+				mutation tokenCreate($email: String!, $password: String!) {
+					tokenCreate(email: $email, password: $password) {
+						token
+						refreshToken
+						errors {
+							field
+							message
+							code
+						}
+						user {
+							id
+							email
+							firstName
+							lastName
+						}
+					}
+				}
+			`;
+
+			const variables = {
 				email: formData.email,
 				password: formData.password,
+			};
+
+			const response = await fetch(process.env.NEXT_PUBLIC_SALEOR_API_URL!, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					query: mutation,
+					variables: variables,
+				}),
 			});
+
+			const result = (await response.json()) as any;
+
+			if (result.errors) {
+				setErrors({ general: "An unexpected error occurred. Please try again." });
+				return;
+			}
+
+			if (result.data?.tokenCreate?.errors && result.data.tokenCreate.errors.length > 0) {
+				setErrors({ general: "Invalid email or password. Please try again." });
+				return;
+			}
 
 			// Check if signIn was successful
 			if (result.data?.tokenCreate?.token) {
+				// Store the token in localStorage for now (in a real app, you'd use proper auth management)
+				localStorage.setItem("saleor-auth-token", result.data.tokenCreate.token);
+				if (result.data.tokenCreate.refreshToken) {
+					localStorage.setItem("saleor-refresh-token", result.data.tokenCreate.refreshToken);
+				}
+
+				// Trigger a custom event to notify other components about auth state change
+				window.dispatchEvent(
+					new CustomEvent("authStateChanged", {
+						detail: { user: result.data.tokenCreate.user, action: "login" },
+					}),
+				);
+
 				// Login successful - redirect to home or intended page
 				const redirectTo = searchParams.get("redirect") || "/";
 				router.push(redirectTo);
@@ -96,8 +150,8 @@ export function LoginForm() {
 		<div className="mx-auto mt-8 w-full max-w-md">
 			<div className="rounded-lg bg-white p-8 shadow-lg">
 				<div className="mb-6 text-center">
-					<h1 className="text-2xl font-bold text-chaldal-gray-dark">Welcome Back</h1>
-					<p className="mt-2 text-sm text-chaldal-gray-medium">Sign in to your FreshMart account</p>
+					<h1 className="text-chaldal-gray-dark text-2xl font-bold">Welcome Back</h1>
+					<p className="text-chaldal-gray-medium mt-2 text-sm">Sign in to your FreshMart account</p>
 				</div>
 
 				{message && <div className="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-600">{message}</div>}
@@ -108,7 +162,7 @@ export function LoginForm() {
 
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<div>
-						<label htmlFor="email" className="block text-sm font-medium text-chaldal-gray-dark">
+						<label htmlFor="email" className="text-chaldal-gray-dark block text-sm font-medium">
 							Email Address
 						</label>
 						<input
@@ -117,7 +171,7 @@ export function LoginForm() {
 							name="email"
 							value={formData.email}
 							onChange={handleInputChange}
-							className={`mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-chaldal-green ${
+							className={`focus:ring-chaldal-green mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ${
 								errors.email ? "border-red-300 focus:ring-red-500" : "border-gray-300"
 							}`}
 							placeholder="Enter your email"
@@ -126,7 +180,7 @@ export function LoginForm() {
 					</div>
 
 					<div>
-						<label htmlFor="password" className="block text-sm font-medium text-chaldal-gray-dark">
+						<label htmlFor="password" className="text-chaldal-gray-dark block text-sm font-medium">
 							Password
 						</label>
 						<input
@@ -135,7 +189,7 @@ export function LoginForm() {
 							name="password"
 							value={formData.password}
 							onChange={handleInputChange}
-							className={`mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-chaldal-green ${
+							className={`focus:ring-chaldal-green mt-1 w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 ${
 								errors.password ? "border-red-300 focus:ring-red-500" : "border-gray-300"
 							}`}
 							placeholder="Enter your password"
@@ -149,9 +203,9 @@ export function LoginForm() {
 								id="remember-me"
 								name="remember-me"
 								type="checkbox"
-								className="h-4 w-4 rounded border-gray-300 text-chaldal-green focus:ring-chaldal-green"
+								className="text-chaldal-green focus:ring-chaldal-green h-4 w-4 rounded border-gray-300"
 							/>
-							<label htmlFor="remember-me" className="ml-2 block text-sm text-chaldal-gray-medium">
+							<label htmlFor="remember-me" className="text-chaldal-gray-medium ml-2 block text-sm">
 								Remember me
 							</label>
 						</div>
@@ -159,7 +213,7 @@ export function LoginForm() {
 						<div className="text-sm">
 							<LinkWithChannel
 								href="/forgot-password"
-								className="font-medium text-chaldal-green hover:text-chaldal-green-dark"
+								className="text-chaldal-green hover:text-chaldal-green-dark font-medium"
 							>
 								Forgot password?
 							</LinkWithChannel>
@@ -176,11 +230,11 @@ export function LoginForm() {
 				</form>
 
 				<div className="mt-6 text-center">
-					<p className="text-sm text-chaldal-gray-medium">
+					<p className="text-chaldal-gray-medium text-sm">
 						Don&apos;t have an account?{" "}
 						<LinkWithChannel
 							href="/signup"
-							className="font-medium text-chaldal-green hover:text-chaldal-green-dark"
+							className="text-chaldal-green hover:text-chaldal-green-dark font-medium"
 						>
 							Create account
 						</LinkWithChannel>
