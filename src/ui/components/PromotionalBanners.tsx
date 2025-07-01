@@ -1,4 +1,6 @@
 import { LinkWithChannel } from "../atoms/LinkWithChannel";
+import { executeGraphQL } from "@/lib/graphql";
+import { CollectionsListDocument } from "@/gql/graphql";
 
 interface Banner {
 	id: string;
@@ -12,48 +14,95 @@ interface Banner {
 	icon: string;
 }
 
-const promotionalBanners: Banner[] = [
+// Mock data removed - now using dynamic Saleor collections
+
+// Style variations for collection banners
+const collectionBannerStyles = [
 	{
-		id: "1",
-		title: "Free Delivery",
-		subtitle: "On orders over $50",
-		description: "Get your groceries delivered for free when you spend $50 or more",
-		ctaText: "Shop Now",
-		ctaLink: "/products",
 		bgColor: "bg-gradient-to-r from-primary-500 to-primary-600",
 		textColor: "text-white",
-		icon: "🚚",
+		icon: "🛒",
 	},
 	{
-		id: "2",
-		title: "Fresh Deals",
-		subtitle: "Up to 30% off",
-		description: "Save big on fresh produce and organic items this week",
-		ctaText: "View Deals",
-		ctaLink: "/collections/deals",
 		bgColor: "bg-gradient-to-r from-secondary-500 to-secondary-600",
 		textColor: "text-white",
-		icon: "🥕",
+		icon: "🎯",
 	},
 	{
-		id: "3",
-		title: "Same Day Delivery",
-		subtitle: "Order by 2 PM",
-		description: "Get your essentials delivered the same day when you order before 2 PM",
-		ctaText: "Order Now",
-		ctaLink: "/products",
 		bgColor: "bg-gradient-to-r from-accent-500 to-accent-600",
 		textColor: "text-white",
-		icon: "⚡",
+		icon: "⭐",
 	},
 ];
 
-export function PromotionalBanners() {
+// Fallback banners when no collections are available
+const fallbackBanners: Banner[] = [
+	{
+		id: "fallback-1",
+		title: "Shop Now",
+		subtitle: "Great Products",
+		description: "Discover amazing products in our store",
+		ctaText: "Browse Products",
+		ctaLink: "/products",
+		bgColor: "bg-gradient-to-r from-primary-500 to-primary-600",
+		textColor: "text-white",
+		icon: "🛒",
+	},
+	{
+		id: "fallback-2",
+		title: "New Arrivals",
+		subtitle: "Fresh Selection",
+		description: "Check out our latest products and collections",
+		ctaText: "View New",
+		ctaLink: "/products",
+		bgColor: "bg-gradient-to-r from-secondary-500 to-secondary-600",
+		textColor: "text-white",
+		icon: "🎯",
+	},
+	{
+		id: "fallback-3",
+		title: "Best Sellers",
+		subtitle: "Popular Items",
+		description: "Shop our most popular and highly rated products",
+		ctaText: "Shop Best",
+		ctaLink: "/products",
+		bgColor: "bg-gradient-to-r from-accent-500 to-accent-600",
+		textColor: "text-white",
+		icon: "⭐",
+	},
+];
+
+export async function PromotionalBanners({ channel }: { channel: string }) {
+	const { collections } = await executeGraphQL(CollectionsListDocument, {
+		variables: { first: 3, channel },
+		revalidate: 60 * 60, // Cache for 1 hour
+	});
+
+	// Use collections if available, otherwise fallback to static banners
+	const banners = collections?.edges?.length
+		? collections.edges.slice(0, 3).map(({ node: collection }, index) => {
+				const style = collectionBannerStyles[index % collectionBannerStyles.length];
+				return {
+					id: collection.id,
+					title: collection.name,
+					subtitle: `${collection.products?.totalCount || 0} products`,
+					description:
+						collection.description ||
+						`Discover amazing products in our ${collection.name.toLowerCase()} collection`,
+					ctaText: "Shop Collection",
+					ctaLink: `/collections/${collection.slug}`,
+					bgColor: style.bgColor,
+					textColor: style.textColor,
+					icon: style.icon,
+				};
+			})
+		: fallbackBanners;
+
 	return (
 		<section className="py-8 sm:py-12">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-					{promotionalBanners.map((banner) => (
+					{banners.map((banner) => (
 						<div
 							key={banner.id}
 							className={`${banner.bgColor} overflow-hidden rounded-lg shadow-lg transition-shadow duration-300 hover:shadow-xl`}

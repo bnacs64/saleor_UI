@@ -15,7 +15,17 @@ interface FilterSection {
 	options: FilterOption[];
 }
 
-const groceryFilters: FilterSection[] = [
+interface SearchFiltersProps {
+	categories?: Array<{
+		id: string;
+		name: string;
+		slug: string;
+		products?: { totalCount: number };
+	}>;
+}
+
+// Fallback filters when no dynamic data is available
+const fallbackFilters: FilterSection[] = [
 	{
 		id: "category",
 		name: "Category",
@@ -43,17 +53,6 @@ const groceryFilters: FilterSection[] = [
 		],
 	},
 	{
-		id: "brand",
-		name: "Brand",
-		options: [
-			{ id: "fresh-farms", name: "Fresh Farms", count: 28 },
-			{ id: "organic-valley", name: "Organic Valley", count: 19 },
-			{ id: "local-harvest", name: "Local Harvest", count: 15 },
-			{ id: "green-choice", name: "Green Choice", count: 22 },
-			{ id: "nature-best", name: "Nature's Best", count: 17 },
-		],
-	},
-	{
 		id: "price",
 		name: "Price Range",
 		options: [
@@ -66,7 +65,30 @@ const groceryFilters: FilterSection[] = [
 	},
 ];
 
-export function SearchFilters() {
+export function SearchFilters({ categories }: SearchFiltersProps) {
+	// Build dynamic filters from categories
+	const dynamicFilters: FilterSection[] = [
+		// Categories section from Saleor data
+		...(categories?.length
+			? [
+					{
+						id: "category",
+						name: "Category",
+						options: categories.map((category) => ({
+							id: category.slug,
+							name: category.name,
+							count: category.products?.totalCount || 0,
+						})),
+					},
+				]
+			: []),
+		// Keep dietary and price filters as static for now
+		...fallbackFilters.filter((section) => section.id !== "category"),
+	];
+
+	// Use dynamic filters if available, otherwise fallback
+	const groceryFilters = dynamicFilters.length > 0 ? dynamicFilters : fallbackFilters;
+
 	const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["category", "dietary"]));
 	const [selectedFilters, setSelectedFilters] = useState<Set<string>>(new Set());
 

@@ -34,10 +34,10 @@ export default async function Page(props: { params: Promise<{ channel: string }>
 			</div>
 
 			{/* Category Grid */}
-			<CategoryGrid />
+			<CategoryGrid channel={params.channel} />
 
 			{/* Promotional Banners */}
-			<PromotionalBanners />
+			<PromotionalBanners channel={params.channel} />
 
 			{/* Featured Products */}
 			{products.length > 0 && (

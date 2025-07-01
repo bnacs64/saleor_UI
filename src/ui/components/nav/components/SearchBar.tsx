@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { SearchIcon } from "lucide-react";
+import { executeGraphQL } from "@/lib/graphql";
+import { CategoriesListDocument } from "@/gql/graphql";
 
-const grocerySearchSuggestions = [
+// Fallback search suggestions
+const fallbackSearchSuggestions = [
 	"Fresh fruits",
 	"Vegetables",
 	"Dairy products",
@@ -16,7 +19,7 @@ const grocerySearchSuggestions = [
 	"Personal care",
 ];
 
-export const SearchBar = ({ channel }: { channel: string }) => {
+export const SearchBar = async ({ channel }: { channel: string }) => {
 	async function onSubmit(formData: FormData) {
 		"use server";
 		const search = formData.get("search") as string;
@@ -25,9 +28,19 @@ export const SearchBar = ({ channel }: { channel: string }) => {
 		}
 	}
 
+	// Fetch categories for dynamic search suggestions
+	const { categories } = await executeGraphQL(CategoriesListDocument, {
+		variables: { first: 10, channel },
+		revalidate: 60 * 60, // Cache for 1 hour
+	});
+
+	// Use category names as search suggestions, fallback to static suggestions
+	const searchSuggestions = categories?.edges?.length
+		? categories.edges.map(({ node }) => node.name)
+		: fallbackSearchSuggestions;
+
 	// Get a random suggestion for placeholder
-	const randomSuggestion =
-		grocerySearchSuggestions[Math.floor(Math.random() * grocerySearchSuggestions.length)];
+	const randomSuggestion = searchSuggestions[Math.floor(Math.random() * searchSuggestions.length)];
 
 	return (
 		<form

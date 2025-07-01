@@ -3,7 +3,7 @@ import { OrderDirection, ProductOrderField, SearchProductsDocument } from "@/gql
 import { executeGraphQL } from "@/lib/graphql";
 import { Pagination } from "@/ui/components/Pagination";
 import { ProductList } from "@/ui/components/ProductList";
-import { SearchFilters } from "@/ui/components/SearchFilters";
+import { SearchFiltersContainer } from "@/ui/components/SearchFiltersContainer";
 import { ProductsPerPage } from "@/app/config";
 
 export const metadata = {
@@ -71,7 +71,7 @@ export default async function Page(props: {
 						{/* Filters Sidebar */}
 						<div className="hidden lg:block">
 							<div className="sticky top-8">
-								<SearchFilters />
+								<SearchFiltersContainer channel={params.channel} />
 							</div>
 						</div>
 

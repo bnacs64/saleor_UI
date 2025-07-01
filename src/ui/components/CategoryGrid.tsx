@@ -1,114 +1,42 @@
 import { LinkWithChannel } from "../atoms/LinkWithChannel";
+import { executeGraphQL } from "@/lib/graphql";
+import { CategoriesListDocument } from "@/gql/graphql";
 
-interface Category {
-	id: string;
-	name: string;
-	slug: string;
-	icon: string;
-	color: string;
-	description?: string;
+// Fallback icons and colors for categories
+const categoryIcons: Record<string, string> = {
+	"fresh-produce": "🥬",
+	"dairy-eggs": "🥛",
+	"meat-seafood": "🥩",
+	pantry: "🏺",
+	beverages: "🥤",
+	snacks: "🍿",
+	frozen: "🧊",
+	"personal-care": "🧴",
+	household: "🧽",
+	"baby-care": "👶",
+	bakery: "🍞",
+	international: "🌍",
+	default: "🛒",
+};
+
+function getCategoryIcon(slug: string): string {
+	return categoryIcons[slug] || categoryIcons.default;
 }
 
-const groceryCategories: Category[] = [
-	{
-		id: "1",
-		name: "Fresh Produce",
-		slug: "fresh-produce",
-		icon: "🥬",
-		color: "bg-green-100 text-green-800",
-		description: "Fresh fruits & vegetables",
-	},
-	{
-		id: "2",
-		name: "Dairy & Eggs",
-		slug: "dairy-eggs",
-		icon: "🥛",
-		color: "bg-blue-100 text-blue-800",
-		description: "Milk, cheese, yogurt & eggs",
-	},
-	{
-		id: "3",
-		name: "Meat & Seafood",
-		slug: "meat-seafood",
-		icon: "🥩",
-		color: "bg-red-100 text-red-800",
-		description: "Fresh meat & seafood",
-	},
-	{
-		id: "4",
-		name: "Pantry Essentials",
-		slug: "pantry",
-		icon: "🏺",
-		color: "bg-amber-100 text-amber-800",
-		description: "Rice, oil, spices & more",
-	},
-	{
-		id: "5",
-		name: "Beverages",
-		slug: "beverages",
-		icon: "🥤",
-		color: "bg-purple-100 text-purple-800",
-		description: "Drinks & beverages",
-	},
-	{
-		id: "6",
-		name: "Snacks",
-		slug: "snacks",
-		icon: "🍿",
-		color: "bg-orange-100 text-orange-800",
-		description: "Chips, cookies & snacks",
-	},
-	{
-		id: "7",
-		name: "Frozen Foods",
-		slug: "frozen",
-		icon: "🧊",
-		color: "bg-cyan-100 text-cyan-800",
-		description: "Frozen vegetables & meals",
-	},
-	{
-		id: "8",
-		name: "Personal Care",
-		slug: "personal-care",
-		icon: "🧴",
-		color: "bg-pink-100 text-pink-800",
-		description: "Health & beauty products",
-	},
-	{
-		id: "9",
-		name: "Household",
-		slug: "household",
-		icon: "🧽",
-		color: "bg-gray-100 text-gray-800",
-		description: "Cleaning & household items",
-	},
-	{
-		id: "10",
-		name: "Baby Care",
-		slug: "baby-care",
-		icon: "👶",
-		color: "bg-yellow-100 text-yellow-800",
-		description: "Baby food & care products",
-	},
-	{
-		id: "11",
-		name: "Bakery",
-		slug: "bakery",
-		icon: "🍞",
-		color: "bg-orange-100 text-orange-800",
-		description: "Fresh bread & baked goods",
-	},
-	{
-		id: "12",
-		name: "International",
-		slug: "international",
-		icon: "🌍",
-		color: "bg-indigo-100 text-indigo-800",
-		description: "Global cuisine ingredients",
-	},
-];
+interface CategoryGridProps {
+	channel: string;
+}
 
-export function CategoryGrid() {
+export async function CategoryGrid({ channel }: CategoryGridProps) {
+	const { categories } = await executeGraphQL(CategoriesListDocument, {
+		variables: { first: 20, channel },
+		revalidate: 60 * 60, // Cache for 1 hour
+	});
+
+	if (!categories?.edges?.length) {
+		return null;
+	}
+
 	return (
 		<section className="bg-gray-50 py-8 sm:py-12">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -120,7 +48,7 @@ export function CategoryGrid() {
 				</div>
 
 				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6">
-					{groceryCategories.map((category) => (
+					{categories.edges.map(({ node: category }) => (
 						<LinkWithChannel
 							key={category.id}
 							href={`/categories/${category.slug}`}
@@ -128,13 +56,13 @@ export function CategoryGrid() {
 						>
 							<div className="text-center">
 								<div className="mb-2 text-2xl transition-transform duration-200 group-hover:scale-110 sm:mb-3 sm:text-4xl">
-									{category.icon}
+									{getCategoryIcon(category.slug)}
 								</div>
 								<h3 className="mb-1 line-clamp-2 text-xs font-semibold text-gray-900 sm:text-sm">
 									{category.name}
 								</h3>
 								<p className="line-clamp-2 hidden text-xs leading-tight text-gray-500 sm:block">
-									{category.description}
+									{category.description || `Browse ${category.name.toLowerCase()}`}
 								</p>
 							</div>
 							<div className="absolute inset-0 rounded-lg border-2 border-transparent transition-colors duration-200 group-hover:border-primary-200" />
